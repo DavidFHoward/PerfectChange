@@ -1,14 +1,20 @@
 import java.util.List;
 import java.util.ArrayList;
-
+/**
+ * This class contains a program to present the optimal combination of coins for a target value
+ */
 public class PerfectChange
 {
+    /**
+     * the main of the program, that drives the creation of our problem and the solution (Greedy or Dynamic) we employ.
+     * @param args the integers delimited by a space of our denomination of coins and the change we would like to make
+     */
     public static void main(String[] args)
     {
-        List<Integer> denominations = new ArrayList<>();
-        int target = 0;
+        List<Integer> denominations = new ArrayList<>(); // this list contains the type of coins we have
+        int target = 0;// this will contain what value we are targeting with these coins
 
-        for(int i = 0; i < args.length; i++)
+        for(int i = 0; i < args.length; i++) // initialize variables to values pertaining to our problem
         {
             if(Integer.parseInt(args[i]) != 1)
             {
@@ -22,38 +28,46 @@ public class PerfectChange
             }
         }
 
-        Greedy problem = new Greedy(denominations, target);
+        Greedy problem = new Greedy(denominations, target); // construct the problem with a greedy approach
 
-        if(problem.isGreedy())
+        if(problem.isGreedy()) // if this problem is best suited for this strategy
         {
-            Greedy solution = problem;
+            Greedy solution = problem; // then we have our solution
             System.out.println(solution);
         }
-        else
+        else // otherwise construct the Dynamic Strategy
         {
             Dynamic solution = new Dynamic(denominations, target);
             System.out.println(solution);
         }
     }
 }
-
+/**
+ * this class contains the Greedy strategy to solve our coin problem
+ */
 class Greedy
 {
-    private List<Integer> denominations;
-    private int[] numberOfCoin;
-    private int target;
-    private int totalCoins;
+    private List<Integer> denominations; // the type of coins we have
+    private int[] numberOfCoin;// the cooresponding number of coins by denomination
+    private int target; // the change we are trying to make
+    private int totalCoins; // how many coins we use to get our solution
 
+    /**
+     * constructor for our Greedy strategy
+     * @param denominations the list of the type of coins we will use
+     * @param target the value we are trying to reach with the coins
+     */
     public Greedy(List<Integer> denominations, int target)
     {
-        this.denominations = denominations;
+        this.denominations = denominations; // initialize our variables
         numberOfCoin = new int[denominations.size()];
         this.target = target;
         totalCoins = 0;
+
         boolean solved = false;
         int pointer = 0;
 
-        while(!solved)
+        while(!solved) // construct the greedy solution
         {
             if (target - denominations.get(pointer) >= 0)
             {
@@ -69,12 +83,18 @@ class Greedy
         }
 
     }
-
+    /**
+     * simple getter for the total number of coins we use in our solution
+     * @return the total number of coins we use in our solution
+     */
     public int getTotalCoins()
     {
         return this.totalCoins;
     }
-
+    /**
+     * deturmines if the greedy approach is the best to solve this problem
+     * @return true if the greedy appoach is optimal and false otherwise
+     */
     public boolean isGreedy()
     {
         boolean isGreedy = true;
@@ -94,6 +114,11 @@ class Greedy
         return isGreedy;
     }
 
+    /**
+     * toString method to override java.lang.Object and present us with relevent information about the greedy solution
+     * @return the greedy tag with the number of each coin we used in our solution
+     */
+    @Override
     public String toString()
     {
         StringBuilder accumulator = new StringBuilder();
@@ -111,6 +136,9 @@ class Greedy
     }
 
 }
+/**
+ * This is the Dynamic strategy to solving our coin problem.
+ */
 class Dynamic
 {
     public Dynamic(List<Integer> denominations, int target)
