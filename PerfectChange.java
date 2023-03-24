@@ -137,12 +137,90 @@ class Greedy
 
 }
 /**
- * This is the Dynamic strategy to solving our coin problem.
+ * This is the Dynamic strategy to solving our coin problem. Also known as a bottom-up solution
  */
 class Dynamic
 {
+    List<Integer> denominations; // the type of coins we have
+    int[] numberOfCoins; // the number of coins we use to solve our sub problem target
+    int[] coinUsed;// the coin we added to a subproblem to get our next solution
+    int target;// the end goal target
+
+
     public Dynamic(List<Integer> denominations, int target)
+    {   
+        this.denominations = denominations;
+        this.target = target;
+        numberOfCoins = new int[target + 1];
+        coinUsed = new int[target + 1];
+
+        numberOfCoins[0] = 0;
+
+        for(int i = 1; i < numberOfCoins.length; i++)
+        {
+            boolean picked = false;
+
+            Greedy subProblem = new Greedy(denominations, i);
+            numberOfCoins[i] = subProblem.getTotalCoins();
+            int temp = 0;
+
+            for(int j = 1; j < denominations.size(); j++)
+            {
+                if(denominations.get(j) < i)
+                {
+                    coinUsed[i] = denominations.get(j);
+                    temp = j;
+                }
+                    
+            }
+            
+            int tempNumberOfCoins = 1 + numberOfCoins[i - denominations.get(temp + 1)];
+
+            if(tempNumberOfCoins < numberOfCoins[i])
+            {
+                numberOfCoins[i] = tempNumberOfCoins;
+                coinUsed[i] = denominations.get(temp + 1);
+            }
+            else
+                coinUsed[i] = denominations.get(temp);
+        }
+
+
+    }
+
+    @Override
+    public String toString()
     {
+        int[] numberOfCoin = new int[denominations.size()];
+        int counter = target;
+        while(counter >= 0)
+        {
+            boolean found = false;
+            for(int i = 0; i < denominations.size() && !found; i++)
+            {
+                if(denominations.get(i) == coinUsed[counter])
+                {
+                    numberOfCoin[i]++;
+                    counter -= coinUsed[counter];
+                    found = true;
+                }
+            }
+
+        }
+
+        StringBuilder accumulator = new StringBuilder();
+
+        accumulator.append("Dynamic - ");
+
+        for(int i = 0; i < denominations.size(); i++)
+        {
+            if (numberOfCoin[i] != 0)
+                accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
+        }
+        accumulator.delete(accumulator.length() - 2, accumulator.length());
+
+
+        return accumulator.toString();
 
     }
 }
