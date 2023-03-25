@@ -14,6 +14,8 @@ public class PerfectChange
         List<Integer> denominations = new ArrayList<>(); // this list contains the type of coins we have
         int target = 0;// this will contain what value we are targeting with these coins
 
+        
+
         for(int i = 0; i < args.length; i++) // initialize variables to values pertaining to our problem
         {
             if(Integer.parseInt(args[i]) != 1)
@@ -28,6 +30,9 @@ public class PerfectChange
             }
         }
 
+        denominations.add(0);
+
+
         Greedy problem = new Greedy(denominations, target); // construct the problem with a greedy approach
 
         if(problem.isGreedy()) // if this problem is best suited for this strategy
@@ -37,8 +42,15 @@ public class PerfectChange
         }
         else // otherwise construct the Dynamic Strategy
         {
-            Dynamic solution = new Dynamic(denominations, target);
-            System.out.println(solution);
+            Dynamic dynamicSolution = new Dynamic(denominations, target);
+            Greedy greedySolution = problem;
+
+            if(greedySolution.getTotalCoins() < dynamicSolution.getTotalCoins()) // compare both solutions to find the better
+                System.out.println(greedySolution);
+            else 
+                System.out.println(dynamicSolution);
+
+
         }
     }
 }
@@ -99,7 +111,7 @@ class Greedy
     {
         boolean isGreedy = true;
 
-        for(int i = 0; i < denominations.size() - 1 && isGreedy; i++)
+        for(int i = 0; i < denominations.size() - 2 && isGreedy; i++)
         {   
             List<Integer> test1Denominations = denominations.subList(i , denominations.size());
             List<Integer> test2Denominations = denominations.subList(i + 1, denominations.size());
@@ -124,7 +136,7 @@ class Greedy
         StringBuilder accumulator = new StringBuilder();
         accumulator.append("Greedy - ");
 
-        for(int i = 0; i < denominations.size(); i++)
+        for(int i = 0; i < denominations.size() - 1; i++)
         {
             if (numberOfCoin[i] != 0)
                 accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
@@ -155,57 +167,52 @@ class Dynamic
         coinUsed = new int[target + 1];
 
         numberOfCoins[0] = 0;
+        coinUsed[0] = 0;
 
-        for(int i = 1; i < numberOfCoins.length; i++)
+        for(int i = denominations.size() - 2; i >= denominations.size() - 3; i--)
         {
-            boolean picked = false;
-
-            Greedy subProblem = new Greedy(denominations, i);
-            numberOfCoins[i] = subProblem.getTotalCoins();
-            int temp = 0;
-
-            for(int j = 1; j < denominations.size(); j++)
+            for(int j = 1; j < numberOfCoins.length; j++)
             {
-                if(denominations.get(j) < i)
+
+                numberOfCoins[j] = target;
+                coinUsed[j] = 1;
+                coinUsed[coinUsed.length - 1] = 1;
+                if(denominations.get(i) < j )
                 {
-                    coinUsed[i] = denominations.get(j);
-                    temp = j;
+                    if( j >= denominations.get(i + 1) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1)
+                    {
+                        numberOfCoins[j] = numberOfCoins[j - denominations.get(i + 1)] + 1;
+                        coinUsed[j] = denominations.get(i + 1);
+                    }
+                    else
+                    {
+                        numberOfCoins[j] = numberOfCoins[j - denominations.get(i)] + 1;
+                        coinUsed[j] = denominations.get(i);
+                    }
                 }
-                    
+
+
             }
             
-            int tempNumberOfCoins = 1 + numberOfCoins[i - denominations.get(temp + 1)];
-
-            if(tempNumberOfCoins < numberOfCoins[i])
-            {
-                numberOfCoins[i] = tempNumberOfCoins;
-                coinUsed[i] = denominations.get(temp + 1);
-            }
-            else
-                coinUsed[i] = denominations.get(temp);
         }
 
 
     }
 
+    public int getTotalCoins()
+    {
+        return numberOfCoins[numberOfCoins.length - 1] - target;
+    }
+
     @Override
     public String toString()
     {
-        int[] numberOfCoin = new int[denominations.size()];
-        int counter = target;
-        while(counter >= 0)
+        int[] numberOfEachCoin = new int[denominations.size()];
+        int decrementor = target;
+        while(decrementor > 0)
         {
-            boolean found = false;
-            for(int i = 0; i < denominations.size() && !found; i++)
-            {
-                if(denominations.get(i) == coinUsed[counter])
-                {
-                    numberOfCoin[i]++;
-                    counter -= coinUsed[counter];
-                    found = true;
-                }
-            }
-
+            numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
+            decrementor -= coinUsed[decrementor];
         }
 
         StringBuilder accumulator = new StringBuilder();
@@ -214,8 +221,8 @@ class Dynamic
 
         for(int i = 0; i < denominations.size(); i++)
         {
-            if (numberOfCoin[i] != 0)
-                accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
+            if (numberOfEachCoin[i] != 0)
+                accumulator.append(numberOfEachCoin[i] + "x" + denominations.get(i) + ", ");
         }
         accumulator.delete(accumulator.length() - 2, accumulator.length());
 
