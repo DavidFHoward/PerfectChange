@@ -1,4 +1,7 @@
 import java.util.List;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.util.ArrayList;
 /**
  * This class contains a program to present the optimal combination of coins for a target value
@@ -45,8 +48,8 @@ public class PerfectChange
             Dynamic dynamicSolution = new Dynamic(denominations, target);
             Greedy greedySolution = problem;
 
-            if(greedySolution.getTotalCoins() < dynamicSolution.getTotalCoins()) // compare both solutions to find the better
-                System.out.println(greedySolution);
+            if(greedySolution.getTotalCoins() <= dynamicSolution.getTotalCoins()) // compare both solutions to find the better
+                System.out.println(dynamicSolution.getTotalCoins());
             else 
                 System.out.println(dynamicSolution);
 
@@ -167,41 +170,46 @@ class Dynamic
         coinUsed = new int[target + 1];
 
         numberOfCoins[0] = 0;
-        coinUsed[0] = 0;
-
-        for(int i = denominations.size() - 2; i >= denominations.size() - 3; i--)
+        coinUsed[0] = 1;
+        for (int i = 1; i < numberOfCoins.length; i++)
+        {
+            numberOfCoins[i] = target;
+            coinUsed[i] = 1;
+        }
+        
+        for(int i = denominations.size() - 2; i >= 0; i--)
         {
             for(int j = 1; j < numberOfCoins.length; j++)
             {
-
-                numberOfCoins[j] = target;
-                coinUsed[j] = 1;
-                coinUsed[coinUsed.length - 1] = 1;
-                if(denominations.get(i) < j )
+                
+                if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1 && numberOfCoins[j - denominations.get(i)] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1 && numberOfCoins[j] > numberOfCoins[j - denominations.get(i + 1)] + 1)
                 {
-                    if( j >= denominations.get(i + 1) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1)
-                    {
-                        numberOfCoins[j] = numberOfCoins[j - denominations.get(i + 1)] + 1;
-                        coinUsed[j] = denominations.get(i + 1);
-                    }
-                    else
-                    {
-                        numberOfCoins[j] = numberOfCoins[j - denominations.get(i)] + 1;
-                        coinUsed[j] = denominations.get(i);
-                    }
+                    numberOfCoins[j] = numberOfCoins[j - denominations.get(i + 1)] + 1;
+                    coinUsed[j] = denominations.get(i + 1);
                 }
-
-
+                else if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i)] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - denominations.get(i)] + 1 && numberOfCoins[j] > numberOfCoins[j - denominations.get(i)] + 1)
+                {
+                    numberOfCoins[j] = numberOfCoins[j - denominations.get(i)] + 1;
+                    coinUsed[j] = denominations.get(i);
+                }
+                else if(j >= denominations.get(i) && numberOfCoins[j] > numberOfCoins[j - 1] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1)
+                {
+                    numberOfCoins[j] = numberOfCoins[j - 1] + 1;
+                    coinUsed[j] = coinUsed[j - 1];
+                }
+                else 
+                {
+                    numberOfCoins[j] = numberOfCoins[j];
+                    coinUsed[j] = coinUsed[j];
+                }       
             }
             
         }
-
-
     }
 
     public int getTotalCoins()
     {
-        return numberOfCoins[numberOfCoins.length - 1] - target;
+        return numberOfCoins[numberOfCoins.length - 1];
     }
 
     @Override
@@ -209,10 +217,11 @@ class Dynamic
     {
         int[] numberOfEachCoin = new int[denominations.size()];
         int decrementor = target;
-        while(decrementor > 0)
+        while(decrementor > 0 && coinUsed[decrementor] > 0)
         {
             numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
             decrementor -= coinUsed[decrementor];
+            System.out.println(coinUsed[decrementor]);
         }
 
         StringBuilder accumulator = new StringBuilder();
