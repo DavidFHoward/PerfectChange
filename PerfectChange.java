@@ -1,8 +1,6 @@
 import java.util.List;
-
-import javax.lang.model.util.ElementScanner6;
-
 import java.util.ArrayList;
+
 /**
  * This class contains a program to present the optimal combination of coins for a target value
  */
@@ -17,8 +15,6 @@ public class PerfectChange
         List<Integer> denominations = new ArrayList<>(); // this list contains the type of coins we have
         int target = 0;// this will contain what value we are targeting with these coins
 
-        
-
         for(int i = 0; i < args.length; i++) // initialize variables to values pertaining to our problem
         {
             if(Integer.parseInt(args[i]) != 1)
@@ -32,10 +28,6 @@ public class PerfectChange
                 break;
             }
         }
-
-        denominations.add(0);
-
-
         Greedy problem = new Greedy(denominations, target); // construct the problem with a greedy approach
 
         if(problem.isGreedy()) // if this problem is best suited for this strategy
@@ -49,14 +41,13 @@ public class PerfectChange
             Greedy greedySolution = problem;
 
             if(greedySolution.getTotalCoins() <= dynamicSolution.getTotalCoins()) // compare both solutions to find the better
-                System.out.println(dynamicSolution.getTotalCoins());
+                System.out.println(greedySolution);
             else 
                 System.out.println(dynamicSolution);
-
-
         }
     }
 }
+
 /**
  * this class contains the Greedy strategy to solve our coin problem
  */
@@ -96,8 +87,8 @@ class Greedy
             }
             solved = target == 0;
         }
-
     }
+
     /**
      * simple getter for the total number of coins we use in our solution
      * @return the total number of coins we use in our solution
@@ -106,6 +97,7 @@ class Greedy
     {
         return this.totalCoins;
     }
+
     /**
      * deturmines if the greedy approach is the best to solve this problem
      * @return true if the greedy appoach is optimal and false otherwise
@@ -125,7 +117,6 @@ class Greedy
             if(test1.getTotalCoins() > test2.getTotalCoins())
                 isGreedy = false;
         }
-
         return isGreedy;
     }
 
@@ -139,17 +130,15 @@ class Greedy
         StringBuilder accumulator = new StringBuilder();
         accumulator.append("Greedy - ");
 
-        for(int i = 0; i < denominations.size() - 1; i++)
+        for(int i = 0; i < denominations.size(); i++)
         {
             if (numberOfCoin[i] != 0)
                 accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
         }
         accumulator.delete(accumulator.length() - 2, accumulator.length());
 
-
         return accumulator.toString();
     }
-
 }
 /**
  * This is the Dynamic strategy to solving our coin problem. Also known as a bottom-up solution
@@ -161,15 +150,19 @@ class Dynamic
     int[] coinUsed;// the coin we added to a subproblem to get our next solution
     int target;// the end goal target
 
-
+    /**
+     * constructor for our dynamic strategy
+     * @param denominations the type of coins that we have
+     * @param target the change we will make
+     */
     public Dynamic(List<Integer> denominations, int target)
     {   
         this.denominations = denominations;
         this.target = target;
-        numberOfCoins = new int[target + 1];
-        coinUsed = new int[target + 1];
+        numberOfCoins = new int[target + 1]; // the number of coins we use for each sub problem
+        coinUsed = new int[target + 1]; // the coins we used last to get this solution
 
-        numberOfCoins[0] = 0;
+        numberOfCoins[0] = 0; // initialize our worse case solutions
         coinUsed[0] = 1;
         for (int i = 1; i < numberOfCoins.length; i++)
         {
@@ -177,41 +170,50 @@ class Dynamic
             coinUsed[i] = 1;
         }
         
-        for(int i = denominations.size() - 2; i >= 0; i--)
+        for(int i = denominations.size() - 2; i >= 0; i--) // look at each neighboring pair of the types of coins we can use
         {
-            for(int j = 1; j < numberOfCoins.length; j++)
+            for(int j = 1; j < numberOfCoins.length; j++) // go through each sub problem with these two coins
             {
-                
-                if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1 && numberOfCoins[j - denominations.get(i)] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1 && numberOfCoins[j] > numberOfCoins[j - denominations.get(i + 1)] + 1)
+                /*  the following logic uses the principle of transitive closure to make sure we have the minimum coins possible for our solution
+                 *  the variables used are as follows and represent:
+                 *  numberOfCoins[j - 1] + 1                            is our previous best solution with adding the lowest denomination
+                 *  numberOfCoins[j - denominations.get(i)] + 1         is our solution using the highest coin of our two coins
+                 *  numberOfCoins[j - denominations.get(i + 1)] + 1     is our solution using lower coin of the two
+                 * 
+                 *  j >= denominations.get(i) simply prevents us from indexing outside of the array via short circuit logic
+                 */
+                if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1 && numberOfCoins[j - denominations.get(i)] + 1 > numberOfCoins[j - denominations.get(i + 1)] + 1)
                 {
                     numberOfCoins[j] = numberOfCoins[j - denominations.get(i + 1)] + 1;
                     coinUsed[j] = denominations.get(i + 1);
                 }
-                else if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i)] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - denominations.get(i)] + 1 && numberOfCoins[j] > numberOfCoins[j - denominations.get(i)] + 1)
+                else if(j >= denominations.get(i) && numberOfCoins[j - 1] + 1 > numberOfCoins[j - denominations.get(i)] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - denominations.get(i)] + 1)
                 {
                     numberOfCoins[j] = numberOfCoins[j - denominations.get(i)] + 1;
                     coinUsed[j] = denominations.get(i);
                 }
-                else if(j >= denominations.get(i) && numberOfCoins[j] > numberOfCoins[j - 1] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1)
+                else if(j >= denominations.get(i) &&  numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1 && numberOfCoins[j - denominations.get(i + 1)] + 1 > numberOfCoins[j - 1] + 1)
                 {
                     numberOfCoins[j] = numberOfCoins[j - 1] + 1;
                     coinUsed[j] = coinUsed[j - 1];
-                }
-                else 
-                {
-                    numberOfCoins[j] = numberOfCoins[j];
-                    coinUsed[j] = coinUsed[j];
-                }       
-            }
-            
+                }      
+            }    
         }
     }
 
+    /**
+     * method to get the total number of coins we used in our dynamic solution
+     * @return the total number of coins we used in our dynamic solution
+     */
     public int getTotalCoins()
     {
         return numberOfCoins[numberOfCoins.length - 1];
     }
 
+    /**
+     * toString method to override java.lang.Object and present us with relevent information about our dynamic solution
+     * @return the number of each coins that we used along with at dynamic tag to indicate the strategy we used
+     */
     @Override
     public String toString()
     {
@@ -221,11 +223,8 @@ class Dynamic
         {
             numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
             decrementor -= coinUsed[decrementor];
-            System.out.println(coinUsed[decrementor]);
         }
-
         StringBuilder accumulator = new StringBuilder();
-
         accumulator.append("Dynamic - ");
 
         for(int i = 0; i < denominations.size(); i++)
@@ -235,8 +234,6 @@ class Dynamic
         }
         accumulator.delete(accumulator.length() - 2, accumulator.length());
 
-
         return accumulator.toString();
-
     }
 }
