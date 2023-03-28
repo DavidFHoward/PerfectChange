@@ -46,6 +46,27 @@ public class ChangeDriver
                 System.out.println(dynamicSolution);
         }
     }
+    /**
+     * static method used in both the Dynamic Class and the Greedy Class to create the output string
+     * @param strategy the string name of the strategy we are tagging the solution with
+     * @param denominations the types of coins we can use in a list
+     * @param numberOfCoin the number of each type of coin in an array of integers
+     * @return the formated string using these inputs
+     */
+    public static String createString(String strategy, List<Integer> denominations, int[] numberOfCoin)
+    {
+        StringBuilder accumulator = new StringBuilder();
+        accumulator.append(strategy + " - ");
+
+        for(int i = 0; i < denominations.size(); i++)
+        {
+            if (numberOfCoin[i] != 0)
+                accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ( i == denominations.size() - 1? "" :", "));
+        }
+
+
+        return accumulator.toString();
+    }
 }
 
 /**
@@ -127,17 +148,7 @@ class Greedy
     @Override
     public String toString()
     {
-        StringBuilder accumulator = new StringBuilder();
-        accumulator.append("Greedy - ");
-
-        for(int i = 0; i < denominations.size(); i++)
-        {
-            if (numberOfCoin[i] != 0)
-                accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
-        }
-        accumulator.delete(accumulator.length() - 2, accumulator.length());
-
-        return accumulator.toString();
+        return ChangeDriver.createString("Greedy", denominations, numberOfCoin);
     }
 }
 /**
@@ -196,7 +207,8 @@ class Dynamic
                 {
                     numberOfCoins[j] = numberOfCoins[j - 1] + 1;
                     coinUsed[j] = coinUsed[j - 1];
-                }      
+                }  
+                //implicit else if all the following statements are false we change nothing    
             }    
         }
     }
@@ -224,16 +236,7 @@ class Dynamic
             numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
             decrementor -= coinUsed[decrementor];
         }
-        StringBuilder accumulator = new StringBuilder();
-        accumulator.append("Dynamic - ");
 
-        for(int i = 0; i < denominations.size(); i++)
-        {
-            if (numberOfEachCoin[i] != 0)
-                accumulator.append(numberOfEachCoin[i] + "x" + denominations.get(i) + ", ");
-        }
-        accumulator.delete(accumulator.length() - 2, accumulator.length());
-
-        return accumulator.toString();
+        return ChangeDriver.createString("Dynamic", denominations, numberOfEachCoin);
     }
 }
