@@ -4,7 +4,7 @@ import java.util.ArrayList;
 /**
  * This class contains a program to present the optimal combination of coins for a target value
  */
-public class PerfectChange
+public class ChangeDriver
 {
     /**
      * the main of the program, that drives the creation of our problem and the solution (Greedy or Dynamic) we employ.
