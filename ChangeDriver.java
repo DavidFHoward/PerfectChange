@@ -1,3 +1,9 @@
+/* Name: Olivia Howard
+ * Class: CSCI 3005 Algorithms
+ * Instructor: Dr. Smith
+ * Date due: March 31, 2023, 5:00 PM
+ */
+
 import java.util.List;
 import java.util.ArrayList;
 
