@@ -87,8 +87,16 @@ class Greedy
     public Greedy(List<Integer> denominations, int target)
     {
         this.denominations = denominations; // initialize our variables
-        numberOfCoin = new int[denominations.size()];
         this.target = target;
+        initializeSolution();
+    }
+
+    /**
+     * method to encapsulate the initalization of the numberOfCoin array and the totalCoins variable
+     */
+    private void initializeSolution()
+    {
+        numberOfCoin = new int[denominations.size()];
         totalCoins = 0;
 
         boolean solved = false;
@@ -108,6 +116,9 @@ class Greedy
             }
             solved = target == 0;
         }
+
+        this.numberOfCoin = numberOfCoin;
+        this.totalCoins = totalCoins;
     }
 
     /**
@@ -160,6 +171,7 @@ class Dynamic
     int[] numberOfCoins; // the number of coins we use to solve our sub problem target
     int[] coinUsed;// the coin we added to a subproblem to get our next solution
     int target;// the end goal target
+    int[] numberOfEachCoin;
 
     /**
      * constructor for our dynamic strategy
@@ -172,7 +184,24 @@ class Dynamic
         this.target = target;
         numberOfCoins = new int[target + 1]; // the number of coins we use for each sub problem
         coinUsed = new int[target + 1]; // the coins we used last to get this solution
+        initializeSolutionArrays();
+        initializeNumberOfEachCoin();
+    }
 
+    /**
+     * method to get the total number of coins we used in our dynamic solution
+     * @return the total number of coins we used in our dynamic solution
+     */
+    public int getTotalCoins()
+    {
+        return numberOfCoins[numberOfCoins.length - 1];
+    }
+
+    /**
+     * this method encapsulates the initialization of numberOfCoins and coinUsed arrays
+     */
+    private void initializeSolutionArrays()
+    {
         numberOfCoins[0] = 0; // initialize our worse case solutions
         coinUsed[0] = 1;
         for (int i = 1; i < numberOfCoins.length; i++)
@@ -208,18 +237,26 @@ class Dynamic
                     numberOfCoins[j] = numberOfCoins[j - 1] + 1;
                     coinUsed[j] = coinUsed[j - 1];
                 }  
-                //implicit else if all the following statements are false we change nothing    
+                //implicit else: if all the following statements are false we change nothing    
             }    
         }
+        this.numberOfCoins = numberOfCoins;
+        this.coinUsed = coinUsed;
     }
 
     /**
-     * method to get the total number of coins we used in our dynamic solution
-     * @return the total number of coins we used in our dynamic solution
+     * this method initializes our numberOfEachCoin array in our constructor
      */
-    public int getTotalCoins()
+    private void initializeNumberOfEachCoin()
     {
-        return numberOfCoins[numberOfCoins.length - 1];
+        int[] numberOfEachCoin = new int[denominations.size()];
+        int decrementor = target;
+        while(decrementor > 0 && coinUsed[decrementor] > 0)
+        {
+            numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
+            decrementor -= coinUsed[decrementor];
+        }
+        this.numberOfEachCoin = numberOfEachCoin;
     }
 
     /**
@@ -229,14 +266,6 @@ class Dynamic
     @Override
     public String toString()
     {
-        int[] numberOfEachCoin = new int[denominations.size()];
-        int decrementor = target;
-        while(decrementor > 0 && coinUsed[decrementor] > 0)
-        {
-            numberOfEachCoin[denominations.indexOf(coinUsed[decrementor])]++;
-            decrementor -= coinUsed[decrementor];
-        }
-
         return ChangeDriver.createString("Dynamic", denominations, numberOfEachCoin);
     }
 }
