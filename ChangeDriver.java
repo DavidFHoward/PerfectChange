@@ -20,7 +20,7 @@ public class ChangeDriver
     {
         List<Integer> denominations = new ArrayList<>(); // this list contains the type of coins we have
         int target = 0;// this will contain what value we are targeting with these coins
-
+        
         for(int i = 0; i < args.length; i++) // initialize variables to values pertaining to our problem
         {
             if(Integer.parseInt(args[i]) != 1)
@@ -34,44 +34,22 @@ public class ChangeDriver
                 break;
             }
         }
-        Greedy problem = new Greedy(denominations, target); // construct the problem with a greedy approach
 
-        if(problem.isGreedy()) // if this problem is best suited for this strategy
+        Problem solution = new Greedy(denominations, target); // construct the problem with a greedy approach
+
+        if(solution.isGreedy()) // if this problem is best suited for this strategy
         {
-            Greedy solution = problem; // then we have our solution
             System.out.println(solution);
         }
         else // otherwise construct the Dynamic Strategy
         {
             Dynamic dynamicSolution = new Dynamic(denominations, target);
-            Greedy greedySolution = problem;
+            Greedy greedySolution = (Greedy) solution;
 
-            if(greedySolution.getTotalCoins() <= dynamicSolution.getTotalCoins()) // compare both solutions to find the better
+            if(greedySolution.compareTo(dynamicSolution) <= 0) // compare both solutions to find the better
                 System.out.println(greedySolution);
             else 
                 System.out.println(dynamicSolution);
         }
-    }
-    /**
-     * static method used in both the Dynamic Class and the Greedy Class to create the output string
-     * @param strategy the string name of the strategy we are tagging the solution with
-     * @param denominations the types of coins we can use in a list
-     * @param numberOfCoin the number of each type of coin in an array of integers
-     * @return the formated string using these inputs
-     */
-    public static String createString(String strategy, List<Integer> denominations, int[] numberOfCoin)
-    {
-        StringBuilder accumulator = new StringBuilder();
-        accumulator.append(strategy + " - ");
-
-        for(int i = 0; i < denominations.size(); i++)
-        {
-            if (numberOfCoin[i] != 0)
-                accumulator.append(numberOfCoin[i] + "x" + denominations.get(i) + ", ");
-        }
-        
-        accumulator.delete(accumulator.length() - 2, accumulator.length());
-
-        return accumulator.toString();
     }
 }

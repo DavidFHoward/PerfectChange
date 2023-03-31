@@ -1,13 +1,13 @@
+import java.util.List;
+
 /**
  * This is the Dynamic strategy to solving our coin problem. Also known as a bottom-up solution
  */
-class Dynamic
+class Dynamic extends Problem
 {
-    List<Integer> denominations; // the type of coins we have
+    
     int[] numberOfCoins; // the number of coins we use to solve our sub problem target
     int[] coinUsed;// the coin we added to a subproblem to get our next solution
-    int target;// the end goal target
-    int[] numberOfEachCoin;
 
     /**
      * constructor for our dynamic strategy
@@ -16,27 +16,25 @@ class Dynamic
      */
     public Dynamic(List<Integer> denominations, int target)
     {   
-        this.denominations = denominations;
-        this.target = target;
+        super(denominations, target);
         numberOfCoins = new int[target + 1]; // the number of coins we use for each sub problem
         coinUsed = new int[target + 1]; // the coins we used last to get this solution
         initializeSolutionArrays();
         initializeNumberOfEachCoin();
+        initializeTotalCoins();
     }
 
     /**
-     * method to get the total number of coins we used in our dynamic solution
-     * @return the total number of coins we used in our dynamic solution
+     * this method encapsulates the assignment of totalCoins
      */
-    public int getTotalCoins()
+    public void initializeTotalCoins()
     {
-        int temp = 0;
         for(int num: numberOfEachCoin)
         {
-            temp += num;
+            totalCoins += num;
         }
 
-        return temp;
+        this.totalCoins = totalCoins;
     }
 
     /**
@@ -102,12 +100,12 @@ class Dynamic
     }
 
     /**
-     * toString method to override java.lang.Object and present us with relevent information about our dynamic solution
+     * toString method to override Problem toString
      * @return the number of each coins that we used along with at dynamic tag to indicate the strategy we used
      */
     @Override
     public String toString()
     {
-        return ChangeDriver.createString("Dynamic", denominations, numberOfEachCoin);
+        return "Dynamic - " + super.toString();
     }
 }
