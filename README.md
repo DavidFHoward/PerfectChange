@@ -5,3 +5,8 @@ to use this program:
   1. set your path to the java bin folder
   2. javac ChangeDriver.java
   3. java ChangeDriver <the types of coins ending with a 1 then after the 1 the change you would like to make> 
+
+
+example:
+
+  java ChangeDriver 50 25 10 1 34
